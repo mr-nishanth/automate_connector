@@ -1,5 +1,63 @@
 # Automate Connector
 
+## FastAPI Server (Basic)
+
+This repository includes a basic FastAPI server (Python 3.11+) with sample item CRUD routes backed by an in-memory store.
+
+### Installation
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev]"
+```
+
+### Running the server
+
+```bash
+uvicorn app.main:app --reload
+```
+
+The API is then available at `http://127.0.0.1:8000`. Interactive docs are served at `/docs`.
+
+### Running the tests
+
+```bash
+python -m pytest -q
+```
+
+### API endpoints
+
+| Method | Endpoint | Description | Success | Errors |
+|---|---|---|---|---|
+| GET | `/` | Welcome message | 200 | - |
+| GET | `/health` | Health status | 200 | - |
+| GET | `/api/v1/items` | List sample items | 200 | - |
+| GET | `/api/v1/items/{item_id}` | Get item by ID | 200 | 404 if not found, 422 if ID is not an integer |
+| POST | `/api/v1/items` | Create an item | 201 | 422 on invalid body |
+
+Examples:
+
+```bash
+curl http://127.0.0.1:8000/
+# {"message":"Welcome to the automate-connector API"}
+
+curl http://127.0.0.1:8000/health
+# {"status":"ok"}
+
+curl http://127.0.0.1:8000/api/v1/items/1
+# {"id":1,"name":"Widget","description":"A small widget","price":9.99}
+
+curl -X POST http://127.0.0.1:8000/api/v1/items \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Thing","description":"New thing","price":3.5}'
+# {"id":4,"name":"Thing","description":"New thing","price":3.5}
+```
+
+Item body schema: `name` (string, 1-100 chars, required), `description` (string, optional, max 500 chars), `price` (number, >= 0, required).
+
+---
+
 ## Overview
 
 The `automate-connector` repository contains the vendor-specific integration responsible for extracting dealership data from the Automate DMS and preparing it for migration into Tekion ARC.
