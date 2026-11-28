@@ -2,7 +2,13 @@
 
 
 class ReynoldsError(Exception):
-    """Base error for Reynolds client failures."""
+    """Base error for Reynolds client failures.
+
+    ``retryable`` marks whether a failure is safe to retry. It defaults to
+    False; subclasses for transient failures override it to True.
+    """
+
+    retryable: bool = False
 
 
 class VehicleNotFoundError(ReynoldsError):
@@ -12,9 +18,13 @@ class VehicleNotFoundError(ReynoldsError):
 class ReynoldsServerError(ReynoldsError):
     """Server kept returning 5xx responses after all retry attempts."""
 
+    retryable = True
+
 
 class ReynoldsTransportError(ReynoldsError):
     """Timeouts or transport failures persisted after all retry attempts."""
+
+    retryable = True
 
 
 class InvalidResponseError(ReynoldsError):
